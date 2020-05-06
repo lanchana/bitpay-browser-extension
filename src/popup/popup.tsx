@@ -15,7 +15,8 @@ import {
   getBitPayMerchantFromUrl,
   fetchCachedMerchants,
   fetchMerchants,
-  getMerchantInitialEntries
+  getMerchantInitialEntries,
+  addToSupportCategories
 } from '../services/merchant';
 import Amount from './pages/amount/amount';
 import Payment from './pages/payment/payment';
@@ -64,7 +65,8 @@ const Popup: React.FC = () => {
     if (Date.now() - popupLaunchTime.current < 1000) return;
     const updateMerchants = async (): Promise<void> => {
       const [newDirectory, newMerchants] = await Promise.all([fetchDirectory(), fetchMerchants()]);
-      setDirectory(saturateDirectory(newDirectory, newMerchants));
+      const newSupportedDirectory = addToSupportCategories(newDirectory);
+      setDirectory(saturateDirectory(newSupportedDirectory, newMerchants));
       setMerchants(newMerchants);
       setSupportedMerchant(getBitPayMerchantFromUrl(parentUrl.current, newMerchants));
       const newSupportedGiftCards = await get<CardConfig[]>('supportedGiftCards');

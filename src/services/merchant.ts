@@ -1,7 +1,14 @@
 import { CardConfig } from './gift-card.types';
 import { sortByDisplayName, fetchAvailableCards, addToSupportedGiftCards } from './gift-card';
 import { removeProtocolAndWww } from './utils';
-import { DirectIntegration, fetchDirectIntegrations, fetchDirectory, Directory } from './directory';
+import {
+  DirectIntegration,
+  fetchDirectIntegrations,
+  fetchDirectory,
+  DirectoryRawData,
+  DirectoryApiObject,
+  DirectoryCategoryApiObject
+} from './directory';
 import { get, set } from './storage';
 import { currencySymbols } from './currency';
 import { BitpayUser } from './bitpay-id';
@@ -17,6 +24,14 @@ export interface InitialEntry {
   pathname: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: any;
+}
+
+export function addToSupportCategories(directory: DirectoryRawData): DirectoryApiObject {
+  const categories = Object.keys(directory.categories).map(key => ({ name: key, ...directory.categories[key] })) as [
+    DirectoryCategoryApiObject
+  ];
+  const newDirectory: DirectoryApiObject = { curated: { ...directory.curated }, categories };
+  return newDirectory;
 }
 
 export function spreadAmounts(values: Array<number>, currency: string): string {
@@ -107,14 +122,15 @@ export async function fetchCachedMerchants(): Promise<Merchant[]> {
 export async function fetchMerchants(): Promise<Merchant[]> {
   const user = await get<BitpayUser>('bitpayUser');
   const [directory, directIntegrations, availableGiftCards, supportedGiftCards = []] = await Promise.all([
-    fetchDirectory().catch(() => ({ curated: {}, categories: {} } as Directory)),
+    fetchDirectory().catch(() => ({ curated: {}, categories: {} } as DirectoryRawData)),
     fetchDirectIntegrations().catch(() => []),
     fetchAvailableCards({ user }).catch(() => []),
     get<CardConfig[]>('supportedGiftCards')
   ]);
   const newSupportedGiftCards = addToSupportedGiftCards(supportedGiftCards, availableGiftCards);
+  const newDirectory = addToSupportCategories(directory);
   await Promise.all([
-    set<Directory>('directory', directory),
+    set<DirectoryApiObject>('directory', newDirectory),
     set<DirectIntegration[]>('directIntegrations', directIntegrations),
     set<CardConfig[]>('availableGiftCards', availableGiftCards),
     set<CardConfig[]>('supportedGiftCards', newSupportedGiftCards)

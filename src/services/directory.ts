@@ -9,15 +9,23 @@ export interface DirectoryCategoryApiObject {
   displayName: string;
   emoji: string;
   tags: string[];
+  name?: string;
+}
+
+export interface DirectoryRawData {
+  curated: {
+    [category: string]: DirectoryCuration;
+  };
+  categories: {
+    [category: string]: DirectoryCategoryApiObject;
+  };
 }
 
 export interface DirectoryApiObject {
   curated: {
     [category: string]: DirectoryCurationApiObject;
   };
-  categories: {
-    [category: string]: DirectoryCategoryApiObject;
-  };
+  categories: [DirectoryCategoryApiObject];
 }
 
 export interface DirectoryCuration extends DirectoryCurationApiObject {
@@ -32,9 +40,7 @@ export interface Directory {
   curated: {
     [category: string]: DirectoryCuration;
   };
-  categories: {
-    [category: string]: DirectoryCategory;
-  };
+  categories: [DirectoryCategory];
 }
 
 export interface DirectIntegrationApiObject {
@@ -91,16 +97,16 @@ export const saturateDirectory = (directoryApiObject: DirectoryApiObject, mercha
       );
     if (categoryObj.availableMerchants.length === 0) delete directory.curated[category];
   });
-  Object.keys(directory.categories).forEach(category => {
-    const categoryObj = directory.categories[category];
+
+  directory.categories.map((categoryObj, index) => {
     categoryObj.availableMerchants = merchants.filter(merchant =>
       categoryObj.tags.some(tag => merchant.tags.includes(tag))
     );
-    if (categoryObj.availableMerchants.length === 0) delete directory.categories[category];
+    if (categoryObj.availableMerchants.length === 0) directory.categories.splice(index, 1);
   });
   return directory;
 };
 
-export async function fetchDirectory(): Promise<Directory> {
+export async function fetchDirectory(): Promise<DirectoryRawData> {
   return fetch(`${process.env.API_ORIGIN}/merchant-directory/directory`).then(res => res.json());
 }
