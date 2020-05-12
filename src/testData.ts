@@ -68,6 +68,15 @@ export const CardConfigData: CardConfig = {
   }
 };
 
+export const CardConfigWithDiscount: CardConfig = {
+  ...CardConfigData,
+  discounts: [{
+    code: 'discountCode',
+    type: 'percentage',
+    amount: 10
+  }]
+};
+
 export const MerchantData: Merchant = {
   caption:
     'Only redeemable on www.amazon.com (USA website)↵↵Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com.',
@@ -80,6 +89,24 @@ export const MerchantData: Merchant = {
   icon: 'https://bitpay.com/gift-cards/assets/amazoncom/icon2.svg',
   instructions:
     'Only redeemable on www.amazon.com (USA website)↵↵Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com.',
+  link: 'amazon.com',
+  name: 'Amazon.com',
+  tags: ['online', 'games'],
+  theme: '#FF9902'
+};
+
+export const MerchantDataWithGiftCard: Merchant = {
+  caption:
+      'Only redeemable on www.amazon.com (USA website)↵↵Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com.',
+  displayLink: 'amazon.com',
+  displayName: 'Amazon',
+  domains: ['amazon.com'],
+  featured: true,
+  giftCards: [CardConfigWithDiscount],
+  hasDirectIntegration: false,
+  icon: 'https://bitpay.com/gift-cards/assets/amazoncom/icon2.svg',
+  instructions:
+      'Only redeemable on www.amazon.com (USA website)↵↵Amazon.com Gift Cards never expire and can be redeemed towards millions of items at www.amazon.com.',
   link: 'amazon.com',
   name: 'Amazon.com',
   tags: ['online', 'games'],

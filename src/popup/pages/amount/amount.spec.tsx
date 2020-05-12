@@ -7,8 +7,7 @@ import { match } from 'react-router';
 import Amount from './amount';
 import ActionButton from '../../components/action-button/action-button';
 import DiscountText from '../../components/discount-text/discount-text';
-import { CardConfig, GiftCardDiscount } from '../../../services/gift-card.types';
-import { CardConfigData, MerchantData } from '../../../testData';
+import { CardConfigData, CardConfigWithDiscount, MerchantData } from '../../../testData';
 
 const AmountProps = {
   clientId: 'abcd',
@@ -118,14 +117,7 @@ describe('Amount Page', () => {
   it('should hide/show DiscountText based on discount value', () => {
     expect(wrapper.find(DiscountText).exists()).toBeFalsy();
 
-    const cardConfigData: CardConfig = CardConfigData;
-    const discounts: GiftCardDiscount = {
-      code: 'discountCode',
-      type: 'percentage',
-      amount: 10
-    };
-    cardConfigData.discounts = [discounts];
-    location = createLocation(path, { cardConfig: cardConfigData, merchant: MerchantData });
+    location = createLocation(path, { cardConfig: CardConfigWithDiscount, merchant: MerchantData });
     wrapper = shallow(
       <Amount
         clientId={AmountProps.clientId}
